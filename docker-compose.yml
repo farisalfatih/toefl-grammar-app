@@ -1,0 +1,26 @@
+services:
+  toefl-grammar:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: toefl-grammar-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - internal
+      - proxy_default  # terhubung ke network Nginx Proxy Manager
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  internal:
+    driver: bridge
+  proxy_default:
+    external: true  # network milik NPM yang sudah ada
